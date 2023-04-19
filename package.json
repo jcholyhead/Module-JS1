@@ -4,8 +4,13 @@
   "description": "- [ ] Set up example board \r - [ ] Populate repo with coursework issues from Google Classroom Boilerplate\r - [ ] Add core Actions from org store https://docs.github.com/en/actions/creating-actions/sharing-actions-and-workflows-with-your-organization",
   "main": "array-of-objects.js",
   "scripts": {
-    "test": "jest --testMatch='**/*.js'",
+    "test": "jest",
     "format": "prettier --write ."
+  },
+  "jest": {
+    "testMatch": [
+      "**/*.js"
+    ]
   },
   "repository": {
     "type": "git",

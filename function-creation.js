@@ -112,7 +112,12 @@ test("applyDiscount function returns price with 10% discount", () => {
 });
 
 test("printOddNumbers function prints odd numbers between 1 and 2", () => {
-  expectprintOddNumbersToLog([1], 2);
+  const consoleLogSpy = jest.spyOn(console, "log");
+
+  printOddNumbers(2);
+  expect(consoleLogSpy).toHaveBeenNthCalledWith(1, 1);
+
+  consoleLogSpy.mockRestore();
 });
 
 test("printOddNumbers function prints odd numbers between 1 and 10", () => {

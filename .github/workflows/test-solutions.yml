@@ -1,0 +1,17 @@
+name: Test all solutions
+on:
+  push:
+    branches:
+      - "solutions"
+  pull_request:
+    branches:
+      - "solutions"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: npm install
+      - name: Run all tests
+        run: npm test

@@ -23,26 +23,14 @@ PasswordValidationResult=  [false, false, false, false, true]
 
 */
 
-function validatePasswords(passwords) {}
-
-// Returns true if string contains at least one uppercase letter.
-function containsUppercaseLetter(string) {
-  return /[A-Z]/.test(string);
-}
-
-// Returns true if string contains at least one lowercase letter.
-function containsLowercaseLetter(string) {
-  return /[a-z]/.test(string);
-}
-
-// Returns true if string contains at least one number.
-function containsNumber(string) {
-  return /[0-9]/.test(string);
-}
-
-// Returns true if string contains at least one symbol.
-function containsSymbol(string) {
-  return /[!#$%.*&]/.test(string);
+function validatePasswords(passwords) {
+  return passwords.map((password, index, passwords) => {
+    const patterns = [/.{5,}/, /[A-Z]/, /[a-z]/, /[0-9]/, /[!#$%.*&]/];
+    if (!patterns.every((pattern) => pattern.test(password))) {
+      return false;
+    }
+    return index === passwords.indexOf(password);
+  });
 }
 
 /* ======= TESTS - DO NOT MODIFY ===== */

@@ -1,3 +1,9 @@
+/*
+    Imagine you are working on the Financial Times web site! They have a list of article titles stored in an array.
+
+    The home page of the web site has a headline section, which only has space for article titles which are 65 characters or less.
+    Implement the function below, which will return a new array containing only article titles which will fit.
+*/
 function potentialHeadlines(allArticleTitles) {
   let headlines = [];
 
@@ -11,9 +17,9 @@ function potentialHeadlines(allArticleTitles) {
 }
 
 /*
-    The editor of the FT likes short headlines with only a few words!
-    Implement the function below, which returns the title with the fewest words.
-    (you can assume words will always be seperated by a space)
+  The editor of the FT likes short headlines with only a few words!
+  Implement the function below, which returns the title with the fewest words.
+  (you can assume words will always be seperated by a space)
 */
 function titleWithFewestWords(allArticleTitles) {
   let fewestWordsSoFar;
@@ -34,9 +40,9 @@ function titleWithFewestWords(allArticleTitles) {
 }
 
 /*
-    The editor of the FT has realised that headlines which have numbers in them get more clicks!
-    Implement the function below to return a new array containing all the headlines which contain a number.
-    (Hint: remember that you can also loop through the characters of a string if you need to)
+  The editor of the FT has realised that headlines which have numbers in them get more clicks!
+  Implement the function below to return a new array containing all the headlines which contain a number.
+  (Hint: remember that you can also loop through the characters of a string if you need to)
 */
 function headlinesWithNumbers(allArticleTitles) {
   let articlesWithNumbers = [];
@@ -63,8 +69,8 @@ function doesTitleContainANumber(title) {
 }
 
 /*
-    The Financial Times wants to understand what the average number of characters in an article title is.
-    Implement the function below to return this number - rounded to the nearest integer.
+  The Financial Times wants to understand what the average number of characters in an article title is.
+  Implement the function below to return this number - rounded to the nearest integer.
 */
 function averageNumberOfCharacters(allArticleTitles) {
   let totalCharacters = 0;

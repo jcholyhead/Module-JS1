@@ -23,13 +23,9 @@ jobs:
           COMMENT_BODY="Number of files changed in this PR: ${FILES_CHANGED}"
           
           if [ $FILES_CHANGED -ge 6 ]; then
-            COMMENT_BODY="
-                Number of files changed in this PR: ${FILES_CHANGED} 
-                You've made a fair number of changes - good work! 😎"
+            COMMENT_BODY="Number of files changed in this PR: ${FILES_CHANGED}. You've made a fair number of changes - good work! 😎"
           else
-            COMMENT_BODY="
-                Number of files changed in this PR: ${FILES_CHANGED}
-                Looks like you've not answered some of the exercises."
+            COMMENT_BODY="Number of files changed in this PR: ${FILES_CHANGED}. Looks like you've not answered some of the exercises."
 
           fi
 

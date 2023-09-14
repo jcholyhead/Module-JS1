@@ -3,7 +3,7 @@ name: Check some work has happened
 on:
   pull_request:
     branches:
-      - "week-1/**"
+      - "main"
 
 jobs:
   check-diff:
@@ -15,17 +15,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Check that diff isn't too large"
+      - name: "Check that diff isn't too small"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           FILES_CHANGED=$(gh pr diff ${{github.event.pull_request.number}} --name-only | wc -l)
-          COMMENT_BODY=""
+          COMMENT_BODY="Number of files changed in this PR: ${FILES_CHANGED}"
           
           if [ $FILES_CHANGED -ge 6 ]; then
-            COMMENT_BODY="You've made a fair number of changes - good work! 😎"
+            COMMENT_BODY="
+                Number of files changed in this PR: ${FILES_CHANGED} 
+                You've made a fair number of changes - good work! 😎"
           else
-            COMMENT_BODY="Looks like you've not answered some of the exercises."
+            COMMENT_BODY="
+                Number of files changed in this PR: ${FILES_CHANGED}
+                Looks like you've not answered some of the exercises."
+
           fi
 
           curl -s \

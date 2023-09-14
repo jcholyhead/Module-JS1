@@ -6,6 +6,48 @@ on:
       - "main"
 
 jobs:
+  check-prettier:
+    name: Check Prettier Formatting
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'  # or your desired version
+
+    - name: Install Prettier
+      run: npm install --global prettier
+
+    - name: Run Prettier Check
+      run: prettier --check . 
+
+    - name: Post PR comment if failed
+      if: failure()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        COMMENT_BODY="🧪 ❌ Prettier check failed. Please install Prettier in your VS Code and enable 'Format On Save'."
+        curl -s \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        -X POST \
+        -d "{\"body\": \"$COMMENT_BODY\"}" \
+        "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+    - name: Set PR to draft if failed
+      if: failure()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          curl -s \
+          -X PATCH \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          -d '{"draft": true}' \
+          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
+
   check-diff:
     name: Check diff size
     runs-on: ubuntu-latest
@@ -23,9 +65,9 @@ jobs:
           COMMENT_BODY="Number of files changed in this PR: ${FILES_CHANGED}"
           
           if [ $FILES_CHANGED -ge 6 ]; then
-            COMMENT_BODY="Number of files changed in this PR: ${FILES_CHANGED}. You've made a fair number of changes - good work! 😎"
+            COMMENT_BODY="🧪 ✅ Number of files changed in this PR: **${FILES_CHANGED}**.\n\n You've made a fair number of changes - keep it up! 😎"
           else
-            COMMENT_BODY="Number of files changed in this PR: ${FILES_CHANGED}. Looks like you've not answered some of the exercises."
+            COMMENT_BODY="🧪 ❌ Number of files changed in this PR: **${FILES_CHANGED}**. \n\n Looks like you've not answered some of the exercises."
 
           fi
 

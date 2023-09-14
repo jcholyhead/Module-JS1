@@ -25,3 +25,18 @@
 
 // If the angle is greater than 180 degrees and less than 360 degrees,
 // Then the function should return "Reflex angle"
+
+
+function getAngleType(angle) {
+  if (angle === 90) return "Right angle";
+  else if (angle < 90) return "Acute angle";
+  else if (angle > 90 && angle < 180) return "Obtuse angle";
+  else if (angle === 180) return "Straight angle";
+  else if (angle > 180 && angle < 360) return "Reflex angle";
+}
+
+console.assert(getAngleType(90) === 'Right angle', 'Test Case 1 Failed');
+console.assert(getAngleType(45) === 'Acute angle', 'Test Case 2 Failed');
+console.assert(getAngleType(100) === 'Obtuse angle', 'Test Case 3 Failed');
+console.assert(getAngleType(180) === 'Straight angle', 'Test Case 4 Failed');
+console.assert(getAngleType(200) === 'Reflex angle', 'Test Case 5 Failed');

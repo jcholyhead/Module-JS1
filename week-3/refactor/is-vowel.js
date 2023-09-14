@@ -9,6 +9,11 @@ function isVowel(letter) {
   );
 }
 
+function isVowel(letter) {
+  const vowels = ["a", "e", "i", "o", "u"];
+  return vowels.includes(letter);
+}
+
 // here is an implementation of isVowel - this function checks if a letter is a vowel
 
 console.log("case: letter a...");

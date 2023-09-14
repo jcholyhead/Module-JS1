@@ -5,7 +5,22 @@
 
 // This function is commonly used for text encryption and decryption,
 // where shifting characters by a certain value can obscure their meaning or reveal hidden messages.
+function rotateCharacter(char, shift) {
+  const charCode = char.charCodeAt(0);
+  const uppercaseStart = 65;
+  const uppercaseEnd = 90;
+  const lowercaseStart = 97;
+    const lowercaseEnd = 122;
+    const alphabetLength = 26;
 
+  if (charCode >= uppercaseStart && charCode <= uppercaseEnd) {
+    return String.fromCharCode(((charCode - uppercaseStart + shift) % alphabetLength + alphabetLength) % alphabetLength + uppercaseStart);
+  } else if (charCode >= lowercaseStart && charCode <= lowercaseEnd) {
+    return String.fromCharCode(((charCode - lowercaseStart + shift) % alphabetLength + alphabetLength) % alphabetLength + lowercaseStart);
+  } else {
+    return char;
+  }
+}
 // Acceptance criteria:
 
 // Given a character (char) and a shift value (shift),

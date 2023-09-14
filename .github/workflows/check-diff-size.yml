@@ -6,41 +6,6 @@ on:
       - "main"
 
 jobs:
-  - name: Run Prettier Check
-  id: prettier_check
-  continue-on-error: true
-  run: |
-    prettier --list-different . 
-    echo "EXIT_CODE=$?" >> $GITHUB_ENV
-
-- name: Evaluate Prettier Output and Set Draft if Failed
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  run: |
-    if [[ "$EXIT_CODE" == "1" ]]; then
-      COMMENT_BODY="Files aren't formatted according to Prettier rules."
-    elif [[ "$EXIT_CODE" == "2" ]]; then
-      COMMENT_BODY="Something's wrong with Prettier."
-    else
-      COMMENT_BODY="Everything is formatted properly."
-    fi
-
-    if [[ "$EXIT_CODE" != "0" ]]; then
-      curl -s \
-      -X PATCH \
-      -H "Authorization: token $GITHUB_TOKEN" \
-      -H "Accept: application/vnd.github.v3+json" \
-      -d '{"draft": true}' \
-      "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
-    fi
-
-    curl -s \
-    -H "Authorization: token $GITHUB_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    -X POST \
-    -d "{\"body\": \"$COMMENT_BODY\"}" \
-    "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
-
   check-diff:
     name: Check diff size
     runs-on: ubuntu-latest

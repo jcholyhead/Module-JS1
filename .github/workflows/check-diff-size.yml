@@ -6,50 +6,40 @@ on:
       - "main"
 
 jobs:
-  check-prettier:
-    name: Check Prettier Formatting
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+  - name: Run Prettier Check
+  id: prettier_check
+  continue-on-error: true
+  run: |
+    prettier --list-different . 
+    echo "EXIT_CODE=$?" >> $GITHUB_ENV
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
+- name: Evaluate Prettier Output and Set Draft if Failed
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  run: |
+    if [[ "$EXIT_CODE" == "1" ]]; then
+      COMMENT_BODY="Files aren't formatted according to Prettier rules."
+    elif [[ "$EXIT_CODE" == "2" ]]; then
+      COMMENT_BODY="Something's wrong with Prettier."
+    else
+      COMMENT_BODY="Everything is formatted properly."
+    fi
 
-    - name: Install Prettier
-      run: npm install --global prettier
+    if [[ "$EXIT_CODE" != "0" ]]; then
+      curl -s \
+      -X PATCH \
+      -H "Authorization: token $GITHUB_TOKEN" \
+      -H "Accept: application/vnd.github.v3+json" \
+      -d '{"draft": true}' \
+      "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
+    fi
 
-    - name: Run Prettier Check
-      id: prettier_check
-      run: |
-        OUTPUT=$(prettier --list-different . 2>&1)
-        echo "Prettier Output: $OUTPUT"
-        echo "OUTPUT=$OUTPUT" >> $GITHUB_ENV
-      continue-on-error: true
-
-    - name: Evaluate Prettier Output and Set Draft if Failed
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        if [[ -n "$OUTPUT" ]]; then
-          COMMENT_BODY="Prettier found files that aren't formatted correctly."
-          curl -s \
-          -X PATCH \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -d '{"draft": true}' \
-          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
-        else
-          COMMENT_BODY="Prettier didn't run."
-        fi
-        curl -s \
-        -H "Authorization: token $GITHUB_TOKEN" \
-        -H "Accept: application/vnd.github.v3+json" \
-        -X POST \
-        -d "{\"body\": \"$COMMENT_BODY\"}" \
-        "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+    curl -s \
+    -H "Authorization: token $GITHUB_TOKEN" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -X POST \
+    -d "{\"body\": \"$COMMENT_BODY\"}" \
+    "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
 
   check-diff:
     name: Check diff size

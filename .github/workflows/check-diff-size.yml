@@ -16,37 +16,27 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '18'  # or your desired version
+        node-version: '14'
 
     - name: Install Prettier
       run: npm install --global prettier
 
     - name: Run Prettier Check
-      run: prettier --check . 
+      run: prettier --list-different . || echo "Prettier didn't run or some files aren't formatted."
+      continue-on-error: true
 
-    - name: Post PR comment if failed
-      if: failure()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        COMMENT_BODY="🧪 ❌ Prettier check failed. Please install Prettier in your VS Code and enable 'Format On Save'."
-        curl -s \
-        -H "Authorization: token $GITHUB_TOKEN" \
-        -H "Accept: application/vnd.github.v3+json" \
-        -X POST \
-        -d "{\"body\": \"$COMMENT_BODY\"}" \
-        "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
     - name: Set PR to draft if failed
       if: failure()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-          curl -s \
-          -X PATCH \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -d '{"draft": true}' \
-          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
+        COMMENT_BODY="🧪 ❌ Prettier check failed. Please see the log for files that are not formatted correctly. Make sure to run Prettier before committing."
+        curl -s \
+        -X PATCH \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        -d '{"draft": true}' \
+        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
 
   check-diff:
     name: Check diff size

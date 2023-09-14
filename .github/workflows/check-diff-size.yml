@@ -1,4 +1,4 @@
-name: Check some work has happened
+name: Check some work has happened and linting is set up
 
 on:
   pull_request:
@@ -22,21 +22,34 @@ jobs:
       run: npm install --global prettier
 
     - name: Run Prettier Check
-      run: prettier --list-different . || echo "Prettier didn't run or some files aren't formatted."
+      id: prettier_check
+      run: |
+        OUTPUT=$(prettier --list-different . 2>&1)
+        echo "Prettier Output: $OUTPUT"
+        echo "OUTPUT=$OUTPUT" >> $GITHUB_ENV
       continue-on-error: true
 
-    - name: Set PR to draft if failed
-      if: failure()
+    - name: Evaluate Prettier Output and Set Draft if Failed
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        COMMENT_BODY="🧪 ❌ Prettier check failed. Please see the log for files that are not formatted correctly. Make sure to run Prettier before committing."
+        if [[ -n "$OUTPUT" ]]; then
+          COMMENT_BODY="Prettier found files that aren't formatted correctly."
+          curl -s \
+          -X PATCH \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          -d '{"draft": true}' \
+          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
+        else
+          COMMENT_BODY="Prettier didn't run."
+        fi
         curl -s \
-        -X PATCH \
         -H "Authorization: token $GITHUB_TOKEN" \
         -H "Accept: application/vnd.github.v3+json" \
-        -d '{"draft": true}' \
-        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
+        -X POST \
+        -d "{\"body\": \"$COMMENT_BODY\"}" \
+        "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
 
   check-diff:
     name: Check diff size
